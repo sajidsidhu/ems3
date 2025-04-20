@@ -22,16 +22,18 @@ class LeaveApproval extends Component
             'approved_by' => Auth::id(),
             'approved_at' => now()
         ]);
-        
+
         // Update leave balance
         $balance = LeaveBalance::firstOrCreate([
             'employee_id' => $request->employee_id,
             'leave_type_id' => $request->leave_type_id,
             'year' => now()->year
         ]);
-        
+
         $balance->decrement('balance', $request->days_requested);
         $balance->increment('used', $request->days_requested);
+
+        session()->flash('success', 'Leave request approved successfully.');
     }
 
     public function reject($id)

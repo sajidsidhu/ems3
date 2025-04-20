@@ -2,9 +2,11 @@
 namespace App\Livewire\Leave;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\LeaveBalance;
+use App\Models\LeaveRequest;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveRequestList extends Component
 {
@@ -30,6 +32,89 @@ class LeaveRequestList extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function approve($id)
+    {
+        $request = LeaveRequest::findOrFail($id);
+
+        // Check if balance is sufficient
+        $balance = LeaveBalance::firstOrCreate([
+            'employee_id' => $request->employee_id,
+            'leave_type_id' => $request->leave_type_id,
+            'year' => now()->year
+        ]);
+
+        if ($balance->balance < $request->days_requested) {
+            session()->flash('error', 'Insufficient leave balance.');
+            return;
+        }
+
+        // Update status and balance
+        $request->update([
+            'status' => 'approved',
+            'approved_by' => Auth::id(),
+            'approved_at' => now()
+        ]);
+
+        $balance->decrement('balance', $request->days_requested);
+        $balance->increment('used', $request->days_requested);
+
+        session()->flash('success', 'Leave request approved successfully.');
+    }
+
+    public function reject($id)
+    {
+        $request = LeaveRequest::findOrFail($id);
+
+        // Revert balance if previously approved
+        if ($request->status === 'approved') {
+            $balance = LeaveBalance::firstOrCreate([
+                'employee_id' => $request->employee_id,
+                'leave_type_id' => $request->leave_type_id,
+                'year' => now()->year
+            ]);
+
+            $balance->increment('balance', $request->days_requested);
+            $balance->decrement('used', $request->days_requested);
+        }
+
+        // Update status
+        $request->update([
+            'status' => 'rejected',
+            'rejection_reason' => 'Reason for rejection', // Replace with actual input
+        ]);
+
+        session()->flash('success', 'Leave request rejected successfully.');
+    }
+
+    public function changeStatus($id, $status)
+    {
+        $request = LeaveRequest::findOrFail($id);
+        $balance = LeaveBalance::firstOrCreate([
+            'employee_id' => $request->employee_id,
+            'leave_type_id' => $request->leave_type_id,
+            'year' => now()->year
+        ]);
+
+        // Handle balance adjustments
+        if ($status === 'approved') {
+            if ($balance->balance < $request->days_requested) {
+                session()->flash('error', 'Insufficient leave balance.');
+                return;
+            }
+
+            $balance->decrement('balance', $request->days_requested);
+            $balance->increment('used', $request->days_requested);
+        } elseif ($request->status === 'approved') {
+            $balance->increment('balance', $request->days_requested);
+            $balance->decrement('used', $request->days_requested);
+        }
+
+        // Update status
+        $request->update(['status' => $status]);
+
+        session()->flash('success', "Leave request status changed to {$status}.");
     }
 
     public function sort($column)

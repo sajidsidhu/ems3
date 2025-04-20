@@ -3,9 +3,9 @@
 
     <div class="mb-4 flex gap-4">
         <flux:select wire:model="filterStatus">
-            <flux:select.option value="Pending">Pending</flux:select.option>
-            <flux:select.option value="Approved">Approved</flux:select.option>
-            <flux:select.option value="Declined">Declined</flux:select.option>
+            <flux:select.option value="pending">Pending</flux:select.option>
+            <flux:select.option value="approved">Approved</flux:select.option>
+            <flux:select.option value="rejected">Rejected</flux:select.option>
         </flux:select>
     </div>
 
@@ -23,32 +23,22 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($leaves as $leave)
+                @foreach($requests as $request)
                 <tr>
-                    <td>{{ $leave->employee->full_name }}</td>
-                    <td>{{ $leave->leaveType->name }}</td>
+                    <td>{{ $request->employee->full_name }}</td>
+                    <td>{{ $request->leaveType->name }}</td>
+                    <td>{{ $request->start_date }} - {{ $request->end_date }}</td>
+                    <td>{{ $request->days_requested }}</td>
+                    <td>{{ $request->reason }}</td>
                     <td>
-                        {{ $leave->start_date->format('M d') }} - 
-                        {{ $leave->end_date->format('M d') }}
-                        @if($leave->start_time)
-                            <br><small>{{ $leave->start_time }} to {{ $leave->end_time }}</small>
-                        @endif
-                    </td>
-                    <td>{{ $leave->days }}</td>
-                    <td class="max-w-xs">{{ Str::limit($leave->reason, 50) }}</td>
-                    <td>
-                        <flux:badge variant="{{ match($leave->status) {
-                            'Approved' => 'success',
-                            'Declined' => 'danger',
-                            default => 'warning'
-                        }}">
-                            {{ $leave->status }}
+                        <flux:badge variant="{{ $request->status === 'approved' ? 'primary' : ($request->status === 'rejected' ? 'danger' : 'warning') }}">
+                            {{ ucfirst($request->status) }}
                         </flux:badge>
                     </td>
                     <td class="flex gap-2">
-                        @if($leave->status === 'Pending')
-                            <flux:button wire:click="approve({{ $leave->id }})" variant="success">Approve</flux:button>
-                            <flux:button wire:click="reject({{ $leave->id }})" variant="danger">Decline</flux:button>
+                        @if($request->status === 'pending')
+                            <flux:button wire:click="approve({{ $request->id }})" variant="primary">Approve</flux:button>
+                            <flux:button wire:click="reject({{ $request->id }})" variant="danger">Reject</flux:button>
                         @endif
                     </td>
                 </tr>
@@ -58,6 +48,6 @@
     </div>
 
     <div class="mt-4">
-        {{ $leaves->links() }}
+        {{ $requests->links() }}
     </div>
 </div>

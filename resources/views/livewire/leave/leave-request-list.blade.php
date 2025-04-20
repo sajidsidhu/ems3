@@ -1,6 +1,10 @@
 <div class="px-6">
     <h2 class="text-xl font-bold mb-4">Leave Requests</h2>
-    <flux:input icon-trailing="magnifying-glass" type="text" wire:model.live.debounce.500ms="search" placeholder="Search by employee name" class="max-w-sm float-right mb-5" />
+
+    <div class="flex justify-between items-center mb-4">
+        <flux:input icon-trailing="magnifying-glass" type="text" wire:model.live.debounce.500ms="search" placeholder="Search by employee name" class="max-w-sm" />
+        <a href="{{ route('leave.approvals') }}" class="btn btn-primary">Go to Leave Approvals</a>
+    </div>
 
     @if (session()->has('success'))
         <div class="alert alert-success mb-4">
@@ -65,16 +69,24 @@
                     <td class="border p-2">{{ $request->leaveType->name }}</td>
                     <td class="border p-2">{{ $request->start_date }}</td>
                     <td class="border p-2">{{ $request->end_date }}</td>
+                    <td class="border p-2">{{ $request->reason }}</td>
                     <td class="border p-2">
-                        <flux:badge size="sm" :color="match($request->status) {
-                            'Approved' => 'green',
-                            'Declined' => 'red',
-                            default => 'orange'
-                        }" inset="top bottom">{{ $request->status }}</flux:badge>
+                        <flux:badge color="{{ $request->status === 'approved' ? 'green' : ($request->status === 'rejected' ? 'red' : 'orange') }}">
+                            {{ ucfirst($request->status) }}
+                        </flux:badge>
                     </td>
-                    <td class="border p-2">
-                        <flux:button wire:click="edit({{ $request->id }})" variant="primary" class="bg-yellow-500 px-2 py-1" icon="pencil-square" size="sm">Edit</flux:button>
-                        <flux:button wire:click="delete({{ $request->id }})" variant="danger" class="px-2 py-1" icon="trash" size="sm">Delete</flux:button>
+                    <td class="border p-2 flex gap-2">
+                        @if ($request->status !== 'approved')
+                            <flux:badge as="button" wire:click="changeStatus({{ $request->id }}, 'approved')" variant="solid" color="green">Approve</flux:badge>
+                        @endif
+                        @if ($request->status !== 'rejected')
+                            <flux:badge as="button" wire:click="changeStatus({{ $request->id }}, 'rejected')" variant="solid" color="rose">Reject</flux:badge>
+                        @endif
+                        @if ($request->status !== 'pending')
+                            <flux:badge as="button" wire:click="changeStatus({{ $request->id }}, 'pending')" variant="solid" color="orange">Set Pending</flux:badge>
+                        @endif
+                        <flux:badge as="button" wire:click="edit({{ $request->id }})" variant="solid" color="yellow">Edit</flux:badge>
+                        <flux:badge as="button" wire:click="delete({{ $request->id }})" variant="solid" color="red">Delete</flux:badge>
                     </td>
                 </tr>
             @endforeach
