@@ -36,6 +36,9 @@ class EmployeeLeave extends Model
         'approved_at' => 'datetime'
     ];
 
+    
+
+
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);

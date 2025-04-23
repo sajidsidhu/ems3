@@ -4,6 +4,7 @@ namespace App\Livewire\Leave;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\LeaveType;
+use App\Models\LeaveBalance;
 use App\Models\EmployeeLeave;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,6 +43,21 @@ class CreateLeaveRequest extends Component
         }
     }
 
+    public function updatedLeaveTypeId()
+    {
+        if ($this->leave_type_id) {
+            $leaveBalance = LeaveBalance::where('employee_id', $this->employee_id)
+                ->where('leave_type_id', $this->leave_type_id)
+                ->where('year', now()->year)
+                ->first();
+
+            if (!$leaveBalance || $leaveBalance->balance <= 0) {
+                session()->flash('error', 'Insufficient leave balance for the selected leave type.');
+                $this->leave_type_id = null; // Reset the leave type selection
+            }
+        }
+    }
+
     private function calculateDays()
     {
         if ($this->start_date && $this->end_date) {
@@ -63,7 +79,12 @@ class CreateLeaveRequest extends Component
     public function submit()
     {
         $this->validate();
-        
+        $leaveBalance = LeaveBalance::getEmployeeLeaveBalance($this->employee_id, $this->leave_type_id, now()->year);
+        if ($leaveBalance->balance < $this->days) {
+            session()->flash('error', 'Insufficient leave balance to apply for this leave.');
+            return;
+        }
+
         EmployeeLeave::create([
             'employee_id' => $this->employee_id,
             'leave_type_id' => $this->leave_type_id,

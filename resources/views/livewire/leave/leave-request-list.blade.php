@@ -3,15 +3,12 @@
 
     <div class="flex justify-between items-center mb-4">
         <flux:input icon-trailing="magnifying-glass" type="text" wire:model.live.debounce.500ms="search" placeholder="Search by employee name" class="max-w-sm" />
-        <a href="{{ route('leave.approvals') }}" class="btn btn-primary">Go to Leave Approvals</a>
     </div>
-
     @if (session()->has('success'))
         <div class="alert alert-success mb-4">
             {{ session('success') }}
         </div>
     @endif
-
     @if ($showEditForm)
         <div class="bg-white p-6 rounded-lg shadow-md mb-6">
             <h3 class="text-lg font-semibold mb-4">Edit Leave Request</h3>
@@ -69,7 +66,6 @@
                     <td class="border p-2">{{ $request->leaveType->name }}</td>
                     <td class="border p-2">{{ $request->start_date }}</td>
                     <td class="border p-2">{{ $request->end_date }}</td>
-                    <td class="border p-2">{{ $request->reason }}</td>
                     <td class="border p-2">
                         <flux:badge color="{{ $request->status === 'approved' ? 'green' : ($request->status === 'rejected' ? 'red' : 'orange') }}">
                             {{ ucfirst($request->status) }}

@@ -4,6 +4,7 @@ namespace App\Livewire\Leave;
 use App\Helpers\Helper;
 use Livewire\Component;
 use App\Models\LeaveType;
+use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +37,11 @@ class LeaveRequestForm extends Component
         
         DB::transaction(function () {
             $daysRequested = Helper::calculateWorkingDays($this->start_date, $this->end_date); // Replace with the actual method for calculating working days
-            
+            $leaveBalance = LeaveBalance::getEmployeeLeaveBalance($this->employee_id, $this->leave_type_id, date('Y', strtotime($this->start_date)));
+            if ($leaveBalance->balance < $daysRequested) {
+                session()->flash('error', 'Insufficient leave balance to apply for this leave.');
+                return;
+            }
             LeaveRequest::create([
                 'employee_id' => $this->employee_id,
                 'leave_type_id' => $this->leave_type_id,
