@@ -1,6 +1,7 @@
 <?php 
 namespace App\Livewire\Leave;
 
+use App\Helpers\Helper;
 use Livewire\Component;
 use App\Models\LeaveType;
 use App\Models\LeaveBalance;
@@ -89,8 +90,17 @@ class LeaveRequestList extends Component
     public function update()
     {
         $this->validate();
-
-        LeaveRequest::findOrFail($this->leaveRequestId)->update([
+        $leave_request = LeaveRequest::findOrFail($this->leaveRequestId);
+        $daysRequested = Helper::calculateWorkingDays($this->start_date, $this->end_date); // Replace with the actual method for calculating working days
+        $leaveBalance = LeaveBalance::getEmployeeLeaveBalance($leave_request->employee_id, $this->leave_type_id, date('Y', strtotime($this->start_date)));
+        
+        if ($leaveBalance->balance < $daysRequested) {
+            session()->flash('error', 'Insufficient leave balance to apply for this leave.');
+            return;
+        }
+        
+        $leave_request->update([
+            'days_requested' => $daysRequested,
             'leave_type_id' => $this->leave_type_id,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
@@ -100,7 +110,6 @@ class LeaveRequestList extends Component
         session()->flash('success', 'Leave request updated successfully.');
 
         $this->resetForm(); // Reset the form
-        $this->emit('refreshComponent'); // Emit an event to refresh the component
     }
 
     public function resetForm()
