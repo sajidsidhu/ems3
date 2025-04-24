@@ -27,26 +27,35 @@ class LeaveRequest extends Model
         });
 
         static::updating(function ($model) {
-            if($model->isDirty('leave_type_id')){
-                $original_leave_type = $model->getOriginal('leave_type_id');
-                $oldLeaveBalance = LeaveBalance::getEmployeeLeaveBalance($model->employee_id, $original_leave_type, date('Y', strtotime($model->start_date)));
-                $oldLeaveBalance->increment('balance', $model->days_requested);
-                $oldLeaveBalance->decrement('used', $model->days_requested);
-                $newLeaveBalance = LeaveBalance::getEmployeeLeaveBalance($model->employee_id, $model->leave_type_id, date('Y', strtotime($model->start_date)));
-                $newLeaveBalance->decrement('balance', $model->days_requested);
-                $newLeaveBalance->increment('used', $model->days_requested);
+            $original_leave_type = $model->getOriginal('leave_type_id');
+            $original_days = $model->getOriginal('days_requested');
+            $original_status = $model->getOriginal('status');
+            $new_leave_type = $model->leave_type_id;
+            $new_days = $model->days_requested;
+            $new_status = $model->status;
+            $year = date('Y', strtotime($model->start_date));
+
+            // If leave type or days change, revert old balance and apply new
+            if ($model->isDirty('leave_type_id') || $model->isDirty('days_requested')) {
+                // Revert old balance
+                $oldLeaveBalance = LeaveBalance::getEmployeeLeaveBalance($model->employee_id, $original_leave_type, $year);
+                $oldLeaveBalance->increment('balance', $original_days);
+                $oldLeaveBalance->decrement('used', $original_days);
+                // Apply new balance
+                $newLeaveBalance = LeaveBalance::getEmployeeLeaveBalance($model->employee_id, $new_leave_type, $year);
+                $newLeaveBalance->decrement('balance', $new_days);
+                $newLeaveBalance->increment('used', $new_days);
             }
 
+            // If status changes
             if ($model->isDirty('status')) {
-                $original_status = $model->getOriginal('status');
-                $new_status = $model->status;
-                $leaveBalance = LeaveBalance::getEmployeeLeaveBalance($model->employee_id, $model->leave_type_id, date('Y', strtotime($model->start_date)));
-                if($new_status == 'rejected'){
-                    $leaveBalance->increment('balance', $model->days_requested);
-                    $leaveBalance->decrement('used', $model->days_requested);
+                $leaveBalance = LeaveBalance::getEmployeeLeaveBalance($model->employee_id, $new_leave_type, $year);
+                if ($new_status == 'rejected') {
+                    $leaveBalance->increment('balance', $new_days);
+                    $leaveBalance->decrement('used', $new_days);
                 } elseif ($original_status == 'rejected') {
-                    $leaveBalance->decrement('balance', $model->days_requested);
-                    $leaveBalance->increment('used', $model->days_requested);
+                    $leaveBalance->decrement('balance', $new_days);
+                    $leaveBalance->increment('used', $new_days);
                 }
             }
         });
