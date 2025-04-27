@@ -6,8 +6,13 @@ use Livewire\Component;
 use App\Models\LeaveType;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
+#[Layout('components.layouts.app')] 
+#[Title('Apply Leave')]
 
 class LeaveRequestForm extends Component
 {

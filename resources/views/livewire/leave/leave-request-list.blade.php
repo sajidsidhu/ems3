@@ -10,10 +10,11 @@
         </div>
     @endif
     @if ($showEditForm)
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    
+<flux:fieldset>
             <h3 class="text-lg font-semibold mb-4">Edit Leave Request</h3>
             <form wire:submit.prevent="update">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="leave_type_id" class="block text-sm font-medium mb-1">Leave Type</label>
                         <flux:select id="leave_type_id" wire:model="leave_type_id">
@@ -34,7 +35,7 @@
                         <flux:input type="date" id="end_date" wire:model="end_date" />
                         @error('end_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
-                    <div>
+                    <div class="md:col-span-3">
                         <label for="reason" class="block text-sm font-medium mb-1">Reason</label>
                         <flux:textarea id="reason" wire:model="reason"></flux:textarea>
                         @error('reason') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -45,9 +46,11 @@
                     <flux:button type="submit" variant="primary">Update</flux:button>
                 </div>
             </form>
-        </div>
+
+</flux:fieldset>
     @endif
 
+    @if(!$showEditForm)
     <table class="mt-4 border-collapse border max-w-full w-full mb-4">
         <thead>
             <tr>
@@ -89,4 +92,6 @@
         </tbody>
     </table>
     {{ $leaveRequests->links() }}
+    
+    @endif
 </div>

@@ -7,7 +7,12 @@ use App\Models\LeaveType;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use Livewire\WithPagination;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
+
+#[Layout('components.layouts.app')] 
+#[Title('Leave Requests')]
 
 class LeaveRequestList extends Component
 {

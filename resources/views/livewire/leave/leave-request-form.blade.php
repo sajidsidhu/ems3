@@ -1,8 +1,8 @@
-<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-2xl font-semibold mb-6">New Leave Request</h2>
 
+<flux:fieldset>
     <form wire:submit.prevent="submit" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <flux:legend class="text-xl font-bold mb-4">Apply Leave</flux:legend>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <flux:field>
                 <flux:label>Leave Type</flux:label>
                 <flux:select wire:model="leave_type_id">
@@ -25,7 +25,7 @@
                 <flux:input type="date" wire:model="end_date" />
             </flux:field>
 
-            <flux:field class="md:col-span-2">
+            <flux:field class="md:col-span-3">
                 <flux:label>Reason</flux:label>
                 <flux:textarea wire:model="reason" rows="4" placeholder="Enter reason for leave..." />
             </flux:field>
@@ -36,4 +36,5 @@
             <flux:button type="submit" variant="primary">Submit Request</flux:button>
         </div>
     </form>
-</div>
+
+</flux:fieldset>
