@@ -10,8 +10,7 @@
         </div>
     @endif
     @if ($showEditForm)
-    
-<flux:fieldset>
+        <flux:fieldset>
             <h3 class="text-lg font-semibold mb-4">Edit Leave Request</h3>
             <form wire:submit.prevent="update">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -46,8 +45,7 @@
                     <flux:button type="submit" variant="primary">Update</flux:button>
                 </div>
             </form>
-
-</flux:fieldset>
+        </flux:fieldset>
     @endif
 
     @if(!$showEditForm)
@@ -92,6 +90,6 @@
         </tbody>
     </table>
     {{ $leaveRequests->links() }}
-    
+
     @endif
 </div>

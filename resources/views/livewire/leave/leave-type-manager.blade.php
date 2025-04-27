@@ -1,26 +1,22 @@
 <div class="px-6">
-    <h2 class="text-xl font-bold mb-4">Leave Types</h2>
-
+    @if(!$showEditForm)
+        <h2 class="text-xl font-bold mb-4">Leave Types</h2>
+    @endif
     @if (session()->has('success'))
         <div class="alert alert-success mb-4">
             {{ session('success') }}
         </div>
     @endif
 
-    @if ($showEditForm)
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    @if($showEditForm)
+        <flux:fieldset>
             <h3 class="text-lg font-semibold mb-4">Edit Leave Type</h3>
             <form wire:submit.prevent="update">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="name" class="block text-sm font-medium mb-1">Name</label>
                         <flux:input type="text" id="name" wire:model="name" />
                         @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label for="description" class="block text-sm font-medium mb-1">Description</label>
-                        <flux:textarea id="description" wire:model="description"></flux:textarea>
-                        @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <label for="default_days" class="block text-sm font-medium mb-1">Default Days</label>
@@ -35,15 +31,21 @@
                         </flux:select>
                         @error('is_active') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
+                    <div class="md:col-span-3">
+                        <label for="description" class="block text-sm font-medium mb-1">Description</label>
+                        <flux:textarea id="description" wire:model="description"></flux:textarea>
+                        @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-4">
                     <flux:button type="button" wire:click="resetForm" variant="ghost">Cancel</flux:button>
                     <flux:button type="submit" variant="primary">Update</flux:button>
                 </div>
             </form>
-        </div>
+        </flux:fieldset>
     @endif
 
+    @if(!$showEditForm)
     <table class="mt-4 border-collapse border max-w-full w-full mb-4">
         <thead>
             <tr>
@@ -74,4 +76,5 @@
         </tbody>
     </table>
     {{ $leaveTypes->links() }}
+    @endif
 </div>
