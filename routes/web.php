@@ -11,7 +11,6 @@ use App\Livewire\Leave\LeaveRequestList;
 use App\Livewire\Leave\LeaveTypeManager;
 use App\Livewire\Attendance\EditAttendance;
 use App\Livewire\Attendance\AttendanceTable;
-use App\Http\Controllers\ComplaintController;
 use App\Livewire\Attendance\CreateAttendance;
 use App\Livewire\ComplaintAssignment;
 use App\Livewire\ComplaintResolution;
