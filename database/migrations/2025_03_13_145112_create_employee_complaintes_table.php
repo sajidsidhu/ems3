@@ -21,6 +21,7 @@ class CreateEmployeeComplaintesTable extends Migration
             $table->text('remarks')->nullable();
             $table->foreignId('resolved_by')->nullable()->constrained('users')->onDelete('set null');
             $table->date('resolved_at')->nullable();
+            $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }

@@ -7,11 +7,15 @@ use App\Livewire\Employee\Index;
 use App\Livewire\Leave\LeaveApproval;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Leave\LeaveRequestForm;
-use App\Livewire\Attendance\EditAttendance;
-use App\Livewire\Attendance\AttendanceTable;
-use App\Livewire\Attendance\CreateAttendance;
 use App\Livewire\Leave\LeaveRequestList;
 use App\Livewire\Leave\LeaveTypeManager;
+use App\Livewire\Attendance\EditAttendance;
+use App\Livewire\Attendance\AttendanceTable;
+use App\Http\Controllers\ComplaintController;
+use App\Livewire\Attendance\CreateAttendance;
+use App\Livewire\ComplaintAssignment;
+use App\Livewire\ComplaintResolution;
+use App\Livewire\AddComplaint;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,6 +47,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/leave/requests', LeaveRequestList::class)->name('leave.requests');
     Route::get('/leave/approvals', LeaveApproval::class)->name('leave.approvals');//->middleware('can:approve-leave');
     Route::get('/leave/types', LeaveTypeManager::class)->name('leave.types');//->middleware('can:manage-leave-types');
+    
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/complaints/assign', ComplaintAssignment::class)->name('complaints.assign');
+        Route::get('/complaints/resolve', ComplaintResolution::class)->name('complaints.resolve');
+        Route::get('/complaints/add', AddComplaint::class)->name('complaints.add');
+    });
 });
 
 require __DIR__.'/auth.php';
