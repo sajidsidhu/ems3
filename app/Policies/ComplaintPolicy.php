@@ -12,7 +12,7 @@ class ComplaintPolicy
      */
     public function assign(User $user)
     {
-        return $user->role === 'HR' || $user->role === 'Admin';
+        return $user->role === 'HR Administrator' || $user->role === 'Admin';
     }
 
     /**

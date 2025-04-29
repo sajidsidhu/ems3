@@ -82,7 +82,8 @@
                     <flux:navlist.item icon="cog" :href="route('leave.types')" :current="request()->routeIs('leave.types')">Manage Leave Types</flux:navlist.item>
                 </flux:navlist.group>
                 <!-- Complaints -->
-                <flux:navlist.group expandable :expanded="request()->routeIs('complaints.add') || request()->routeIs('complaints.assign') || request()->routeIs('complaints.resolve') ? true : false" heading="Complaints" class="hidden lg:grid">
+                <flux:navlist.group expandable :expanded="request()->routeIs('complaints.list') || request()->routeIs('complaints.add') || request()->routeIs('complaints.assign') || request()->routeIs('complaints.resolve') ? true : false" heading="Complaints" class="hidden lg:grid">
+                    <flux:navlist.item icon="list" :href="route('complaints.list')" :current="request()->routeIs('complaints.list')">Complaint List</flux:navlist.item>
                     <flux:navlist.item icon="plus-circle" :href="route('complaints.add')" :current="request()->routeIs('complaints.add')">Add Complaint</flux:navlist.item>
                     <flux:navlist.item icon="user-plus" :href="route('complaints.assign')" :current="request()->routeIs('complaints.assign')">Assign Complaints</flux:navlist.item>
                     <flux:navlist.item icon="check-circle" :href="route('complaints.resolve')" :current="request()->routeIs('complaints.resolve')">Resolve Complaints</flux:navlist.item>
