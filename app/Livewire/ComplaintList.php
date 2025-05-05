@@ -14,19 +14,10 @@ class ComplaintList extends Component
     protected $paginationTheme = 'tailwind';
 
     public $search = '';
-    public $assigneeId;
-    public $showAssignModal = false;
-    public $selectedComplaint;
-    public $showModal = false;
+    public $complaintToDelete = null;
 
     protected $rules = [
-        'assigneeId' => 'nullable|exists:users,id',
         'search' => 'nullable|string|max:255',
-    ];
-
-    protected $messages = [
-        'assigneeId.exists' => 'The selected assignee does not exist.',
-        'search.max' => 'Search query must not exceed 255 characters.',
     ];
 
     public function mount()
@@ -37,6 +28,33 @@ class ComplaintList extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->complaintToDelete = $id;
+    }
+
+    public function cancelDelete()
+    {
+        $this->complaintToDelete = null;
+    }
+
+    public function delete()
+    {
+        $complaint = EmployeeComplainte::findOrFail($this->complaintToDelete);
+        
+        // Check if user has permission to delete
+        $user = Auth::user();
+        if (!in_array($user->role, ['HR Administrator', 'HR']) && 
+            $complaint->employee_id !== $user->id) {
+            session()->flash('error', 'You are not authorized to delete this complaint.');
+            return;
+        }
+
+        $complaint->delete();
+        session()->flash('success', 'Complaint deleted successfully.');
+        $this->complaintToDelete = null;
     }
 
     public function render()
@@ -69,96 +87,6 @@ class ComplaintList extends Component
         }
         
         $complaints = $query->orderBy('created_at', 'desc')->paginate(10);
-
         return view('livewire.complaint-list', compact('complaints'));
-    }
-
-    public function viewComplaint($id)
-    {
-        $this->selectedComplaint = EmployeeComplainte::with(['creator', 'assignee'])->findOrFail($id);
-        $this->showModal = true;
-    }
-
-    public function closeModal()
-    {
-        $this->showModal = false;
-        $this->showAssignModal = false;
-    }
-
-    public function editComplaint($id)
-    {
-        $complaint = EmployeeComplainte::findOrFail($id);
-
-        if ($complaint->employee_id !== Auth::id()) {
-            session()->flash('error', 'You are not authorized to edit this complaint.');
-            return;
-        }
-
-        // Logic for editing the complaint (e.g., redirect to edit page or open modal)
-    }
-
-    public function deleteComplaint($id)
-    {
-        $complaint = EmployeeComplainte::findOrFail($id);
-
-        if ($complaint->employee_id !== Auth::id()) {
-            session()->flash('error', 'You are not authorized to delete this complaint.');
-            return;
-        }
-
-        $complaint->delete();
-        session()->flash('success', 'Complaint deleted successfully.');
-        $this->mount(); // Refresh the complaints list
-    }
-
-    public function openAssignModal($id)
-    {
-        $this->selectedComplaint = EmployeeComplainte::findOrFail($id);
-        $this->showAssignModal = true;
-    }
-
-    public function updated($propertyName)
-    {
-        $this->validateOnly($propertyName);
-    }
-
-    public function assignToUser()
-    {
-        $this->validate([
-            'assigneeId' => 'required|exists:users,id',
-        ], [
-            'assigneeId.required' => 'Please select a user to assign the complaint.',
-            'assigneeId.exists' => 'The selected user does not exist.',
-        ]);
-
-        $this->selectedComplaint->assigned_to = $this->assigneeId;
-        $this->selectedComplaint->save();
-
-        session()->flash('success', 'Complaint assigned successfully.');
-        $this->showAssignModal = false;
-        $this->mount(); // Refresh complaints list
-    }
-
-    public function resolveComplaint($id)
-    {
-        $complaint = EmployeeComplainte::findOrFail($id);
-
-        if (auth()->user()->role !== 'HR Administrator') {
-            session()->flash('error', 'You are not authorized to resolve complaints.');
-            return;
-        }
-
-        $complaint->status = 'Resolved';
-        $complaint->resolved_by = auth()->id();
-        $complaint->resolved_at = now();
-        $complaint->save();
-
-        session()->flash('success', 'Complaint marked as resolved.');
-        $this->mount(); // Refresh the complaints list
-    }
-
-    protected function getAuthenticatedUser()
-    {
-        return auth()->check() ? auth()->user() : null;
     }
 }

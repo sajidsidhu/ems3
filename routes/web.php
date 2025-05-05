@@ -1,13 +1,12 @@
 <?php
 
 use Livewire\Volt\Volt;
-use App\Livewire\Attendance;
 use App\Livewire\AddComplaint;
 use App\Livewire\Employee\Add;
 use App\Livewire\ComplaintList;
 use App\Livewire\Employee\Index;
-use App\Livewire\ComplaintAssignment;
-use App\Livewire\ComplaintResolution;
+use App\Livewire\ViewComplaint;
+use App\Livewire\EditComplaint;
 use App\Livewire\Leave\LeaveApproval;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Leave\LeaveRequestForm;
@@ -49,10 +48,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/leave/types', LeaveTypeManager::class)->name('leave.types');//->middleware('can:manage-leave-types');
     
     Route::middleware(['auth'])->group(function () {
-        Route::get('/complaints/assign', ComplaintAssignment::class)->name('complaints.assign');
-        Route::get('/complaints/resolve', ComplaintResolution::class)->name('complaints.resolve');
         Route::get('/complaints/add', AddComplaint::class)->name('complaints.add');
         Route::get('/complaints/list', ComplaintList::class)->name('complaints.list');
+        Route::get('/complaints/{id}', ViewComplaint::class)->name('complaints.view');
+        Route::get('/complaints/{id}/edit', EditComplaint::class)->name('complaints.edit');
     });
 });
 
