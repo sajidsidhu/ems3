@@ -3,10 +3,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LeaveBalance extends Model
 {
-    protected $fillable = ['employee_id', 'leave_type_id', 'balance', 'used', 'year'];
+    use HasFactory;
+
+    protected $fillable = [
+        'employee_id',
+        'leave_type_id',
+        'balance',
+        'used',
+        'year'
+    ];
 
     public function employee(): BelongsTo
     {

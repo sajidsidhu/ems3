@@ -3,12 +3,13 @@
 namespace Database\Factories;
 
 use App\Models\LeaveType;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LeaveTypeFactory extends Factory
 {
-
     protected $model = LeaveType::class;
+
     /**
      * Define the model's default state.
      *
@@ -16,11 +17,13 @@ class LeaveTypeFactory extends Factory
      */
     public function definition()
     {
+        $name = $this->faker->unique()->randomElement(['Sick Leave', 'Vacation Leave', 'Maternity Leave', 'Paternity Leave', 'Bereavement Leave']);
         return [
-            'name' => $this->faker->unique()->randomElement(['Sick Leave', 'Vacation Leave', 'Maternity Leave', 'Paternity Leave', 'Bereavement Leave']),
+            'name' => $name,
+            'slug' => Str::slug($name),
+            'default_days' => $this->faker->numberBetween(5, 12),
+            'is_active' => true,
             'description' => $this->faker->sentence,
-            'days' => $this->faker->numberBetween(5, 12),
-            'status' => $this->faker->randomElement(['Active', 'Inactive']),
         ];
     }
 }
