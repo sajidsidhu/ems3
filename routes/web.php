@@ -55,9 +55,12 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Payroll Routes
-    Route::get('/payroll', App\Livewire\PayrollList::class)->name('payroll.index');
-    Route::get('/payroll/create', App\Livewire\CreatePayroll::class)->name('payroll.create');
-    Route::get('/payroll/{payroll}', App\Livewire\ViewPayroll::class)->name('payroll.show');
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/payroll', App\Livewire\PayrollList::class)->name('payroll.index');
+        Route::get('/payroll/create', App\Livewire\CreatePayroll::class)->name('payroll.create');
+        Route::get('/payroll/{payroll}', App\Livewire\ViewPayroll::class)->name('payroll.show');
+        Route::get('/payroll/{payroll}/edit', App\Livewire\EditPayroll::class)->name('payroll.edit');
+    });
 });
 
 require __DIR__.'/auth.php';
