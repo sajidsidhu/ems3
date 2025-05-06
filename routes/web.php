@@ -53,6 +53,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/complaints/{id}', ViewComplaint::class)->name('complaints.view');
         Route::get('/complaints/{id}/edit', EditComplaint::class)->name('complaints.edit');
     });
+
+    // Payroll Routes
+    Route::get('/payroll', App\Livewire\PayrollList::class)->name('payroll.index');
+    Route::get('/payroll/create', App\Livewire\CreatePayroll::class)->name('payroll.create');
+    Route::get('/payroll/{payroll}', App\Livewire\ViewPayroll::class)->name('payroll.show');
 });
 
 require __DIR__.'/auth.php';

@@ -86,6 +86,11 @@
                     <flux:navlist.item icon="list" :href="route('complaints.list')" :current="request()->routeIs('complaints.list')  || request()->routeIs('complaints.view') || request()->routeIs('complaints.edit')">Complaint List</flux:navlist.item>
                     <flux:navlist.item icon="plus-circle" :href="route('complaints.add')" :current="request()->routeIs('complaints.add')">Add Complaint</flux:navlist.item>
                 </flux:navlist.group>
+                <!-- Payroll -->
+                <flux:navlist.group expandable :expanded="request()->routeIs('payroll.index') || request()->routeIs('payroll.create') || request()->routeIs('payroll.show') ? true : false" heading="Payroll" class="hidden lg:grid">
+                    <flux:navlist.item icon="list" :href="route('payroll.index')" :current="request()->routeIs('payroll.index') || request()->routeIs('payroll.show')">Payroll List</flux:navlist.item>
+                    <flux:navlist.item icon="plus-circle" :href="route('payroll.create')" :current="request()->routeIs('payroll.create')">Create Payroll</flux:navlist.item>
+                </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
