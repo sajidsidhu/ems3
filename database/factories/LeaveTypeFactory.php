@@ -21,7 +21,7 @@ class LeaveTypeFactory extends Factory
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'default_days' => $this->faker->numberBetween(5, 12),
+            'default_days' => $this->faker->numberBetween(8, 12),
             'is_active' => true,
             'description' => $this->faker->sentence,
         ];

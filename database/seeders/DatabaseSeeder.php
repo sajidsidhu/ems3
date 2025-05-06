@@ -37,28 +37,24 @@ class DatabaseSeeder extends Seeder
         $leaveTypes = [
             [
                 'name' => 'Annual Leave',
-                'slug' => 'annual-leave',
                 'default_days' => 20,
                 'is_active' => true,
                 'description' => 'Regular annual leave',
             ],
             [
                 'name' => 'Sick Leave',
-                'slug' => 'sick-leave',
                 'default_days' => 10,
                 'is_active' => true,
                 'description' => 'Medical leave',
             ],
             [
                 'name' => 'Casual Leave',
-                'slug' => 'casual-leave',
                 'default_days' => 5,
                 'is_active' => true,
                 'description' => 'Short-term leave',
             ],
             [
                 'name' => 'Maternity Leave',
-                'slug' => 'maternity-leave',
                 'default_days' => 90,
                 'is_active' => true,
                 'description' => 'For expecting mothers',
@@ -66,7 +62,13 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($leaveTypes as $type) {
-            LeaveType::factory()->create($type);
+            LeaveType::create([
+                'name' => $type['name'],
+                'slug' => Str::slug($type['name']),
+                'default_days' => $type['default_days'],
+                'is_active' => $type['is_active'],
+                'description' => $type['description'],
+            ]);
         }
 
         // Create employees with related data
