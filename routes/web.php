@@ -1,12 +1,12 @@
 <?php
 
 use Livewire\Volt\Volt;
-use App\Livewire\AddComplaint;
+use App\Livewire\Complaint\AddComplaint;
 use App\Livewire\Employee\Add;
-use App\Livewire\ComplaintList;
+use App\Livewire\Complaint\ComplaintList;
 use App\Livewire\Employee\Index;
-use App\Livewire\ViewComplaint;
-use App\Livewire\EditComplaint;
+use App\Livewire\Complaint\ViewComplaint;
+use App\Livewire\Complaint\EditComplaint;
 use App\Livewire\Leave\LeaveApproval;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Leave\LeaveRequestForm;

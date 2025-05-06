@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Complaint;
 
 use App\Models\EmployeeComplainte;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
+#[Layout('components.layouts.app')]
+#[Title('Complaint List')]
 class ComplaintList extends Component
 {
     use WithPagination;
@@ -87,6 +91,6 @@ class ComplaintList extends Component
         }
         
         $complaints = $query->orderBy('created_at', 'desc')->paginate(10);
-        return view('livewire.complaint-list', compact('complaints'));
+        return view('livewire.complaint.complaint-list', compact('complaints'));
     }
 }

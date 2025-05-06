@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Complaint;
 
 use App\Models\User;
 use Livewire\Component;
@@ -135,7 +135,7 @@ class ViewComplaint extends Component
     {
         $maintenanceStaff = User::where('role', 'Maintenance Staff')->get();
         
-        return view('livewire.view-complaint', [
+        return view('livewire.complaint.view-complaint', [
             'maintenanceStaff' => $maintenanceStaff
         ]);
     }

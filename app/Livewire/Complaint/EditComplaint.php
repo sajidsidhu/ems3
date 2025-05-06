@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Complaint;
 
 use App\Models\EmployeeComplainte;
 use Livewire\Component;
@@ -87,7 +87,7 @@ class EditComplaint extends Component
 
     public function render()
     {
-        return view('livewire.edit-complaint', [
+        return view('livewire.complaint.edit-complaint', [
             'maintenanceStaff' => \App\Models\User::where('role', 'Maintenance Staff')->get()
         ]);
     }

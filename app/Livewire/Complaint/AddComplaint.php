@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Complaint;
 
 use App\Models\EmployeeComplainte;
 use Livewire\Component;
@@ -37,6 +37,6 @@ class AddComplaint extends Component
 
     public function render()
     {
-        return view('livewire.add-complaint');
+        return view('livewire.complaint.add-complaint');
     }
 }
