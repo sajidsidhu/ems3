@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Payroll extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'employee_id',
         'payroll_month',
@@ -16,6 +19,7 @@ class Payroll extends Model
         'total_present_days',
         'total_absent_days',
         'total_late_arrivals',
+        'total_late_minutes',
         'total_leaves_taken',
         'total_working_hours',
         'total_deductions',

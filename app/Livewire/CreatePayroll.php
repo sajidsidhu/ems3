@@ -18,6 +18,7 @@ class CreatePayroll extends Component
     public $total_present_days = 0;
     public $total_absent_days = 0;
     public $total_late_arrivals = 0;
+    public $total_late_minutes = 0;
     public $total_leaves_taken = 0;
     public $total_working_hours = 0;
     public $total_deductions = 0;
@@ -65,17 +66,14 @@ class CreatePayroll extends Component
         $this->total_absent_days = $attendances->where('status', 'Absent')->count();
         $this->total_late_arrivals = $attendances->whereNotNull('clock_in')
             ->filter(function ($attendance) {
-                return Carbon::parse($attendance->clock_in)->format('H:i') > '09:00';
+                return Carbon::parse($attendance->clock_in)->format('H:i') > '08:00';
             })->count();
+        
+        // Calculate total late minutes
+        $this->total_late_minutes = $attendances->sum('late_minutes');
 
         // Calculate working hours
-        $this->total_working_hours = $attendances->sum(function ($attendance) {
-            if ($attendance->clock_in && $attendance->clock_out) {
-                return Carbon::parse($attendance->clock_out)
-                    ->diffInHours(Carbon::parse($attendance->clock_in));
-            }
-            return 0;
-        });
+        $this->total_working_hours = $attendances->sum('working_hours');
 
         // Get approved leaves
         $this->total_leaves_taken = LeaveRequest::where('employee_id', $this->employee_id)
@@ -94,8 +92,8 @@ class CreatePayroll extends Component
         // Deduct for absences
         $absenceDeduction = $this->total_absent_days * $dailyRate;
         
-        // Deduct for late arrivals (e.g., 1 hour late = 1/8 of daily rate)
-        $lateDeduction = $this->total_late_arrivals * ($dailyRate / 8);
+        // Deduct for late minutes (e.g., 1 minute late = 1/480 of daily rate)
+        $lateDeduction = ($this->total_late_minutes / 480) * $dailyRate;
         
         $this->total_deductions = $absenceDeduction + $lateDeduction;
         
@@ -113,6 +111,7 @@ class CreatePayroll extends Component
             'total_present_days' => 'required|integer|min:0',
             'total_absent_days' => 'required|integer|min:0',
             'total_late_arrivals' => 'required|integer|min:0',
+            'total_late_minutes' => 'required|integer|min:0',
             'total_leaves_taken' => 'required|integer|min:0',
             'total_working_hours' => 'required|numeric|min:0',
             'total_deductions' => 'required|numeric|min:0',
@@ -128,6 +127,7 @@ class CreatePayroll extends Component
             'total_present_days' => $this->total_present_days,
             'total_absent_days' => $this->total_absent_days,
             'total_late_arrivals' => $this->total_late_arrivals,
+            'total_late_minutes' => $this->total_late_minutes,
             'total_leaves_taken' => $this->total_leaves_taken,
             'total_working_hours' => $this->total_working_hours,
             'total_deductions' => $this->total_deductions,
