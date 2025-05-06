@@ -88,6 +88,86 @@
                                 @error('net_salary') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
 
+                            <!-- Deductions and Additions -->
+                            <div class="col-span-2">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Deductions and Additions</h3>
+                                
+                                <!-- Add New Detail Form -->
+                                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Type</label>
+                                            <select wire:model="newDetail.type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                <option value="">Select Type</option>
+                                                <option value="addition">Addition</option>
+                                                <option value="deduction">Deduction</option>
+                                            </select>
+                                            @error('newDetail.type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Description</label>
+                                            <input wire:model="newDetail.description" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                            @error('newDetail.description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Amount</label>
+                                            <input wire:model="newDetail.amount" type="number" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                            @error('newDetail.amount') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Remarks</label>
+                                            <input wire:model="newDetail.remarks" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                            @error('newDetail.remarks') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <button type="button" wire:click="addDetail" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                            Add Detail
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Details List -->
+                                @if(count($details) > 0)
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remarks</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                @foreach($details as $index => $detail)
+                                                    <tr>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            {{ ucfirst($detail['type']) }}
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            {{ $detail['description'] }}
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            ${{ number_format($detail['amount'], 2) }}
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            {{ $detail['remarks'] }}
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <button type="button" wire:click="removeDetail({{ $index }})" class="text-red-600 hover:text-red-900">
+                                                                Remove
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+                            </div>
+
                             <!-- Remarks -->
                             <div class="col-span-2">
                                 <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks</label>

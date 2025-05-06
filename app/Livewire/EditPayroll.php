@@ -8,6 +8,7 @@ use App\Models\EmployeeAttendance;
 use App\Models\LeaveRequest;
 use Carbon\Carbon;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 class EditPayroll extends Component
 {
@@ -26,6 +27,13 @@ class EditPayroll extends Component
     public $total_additions = 0;
     public $net_salary = 0;
     public $remarks;
+    public $details = [];
+    public $newDetail = [
+        'type' => '',
+        'description' => '',
+        'amount' => 0,
+        'remarks' => ''
+    ];
 
     public function mount(Payroll $payroll)
     {
@@ -44,6 +52,17 @@ class EditPayroll extends Component
         $this->total_additions = $payroll->total_additions;
         $this->net_salary = $payroll->net_salary;
         $this->remarks = $payroll->remarks;
+        
+        // Load existing details
+        $this->details = $payroll->details->map(function ($detail) {
+            return [
+                'id' => $detail->id,
+                'type' => $detail->type,
+                'description' => $detail->description,
+                'amount' => $detail->amount,
+                'remarks' => $detail->remarks
+            ];
+        })->toArray();
     }
 
     public function updatedEmployeeId()
@@ -116,6 +135,57 @@ class EditPayroll extends Component
         $this->net_salary = $this->basic_salary - $this->total_deductions + $this->total_additions;
     }
 
+    public function addDetail()
+    {
+        $this->validate([
+            'newDetail.type' => 'required|in:addition,deduction',
+            'newDetail.description' => 'required|string|max:255',
+            'newDetail.amount' => 'required|numeric|min:0',
+            'newDetail.remarks' => 'nullable|string|max:255'
+        ]);
+
+        $this->details[] = $this->newDetail;
+        
+        // Update totals
+        if ($this->newDetail['type'] === 'addition') {
+            $this->total_additions += $this->newDetail['amount'];
+        } else {
+            $this->total_deductions += $this->newDetail['amount'];
+        }
+        
+        $this->calculateNetSalary();
+        
+        // Reset new detail
+        $this->newDetail = [
+            'type' => '',
+            'description' => '',
+            'amount' => 0,
+            'remarks' => ''
+        ];
+    }
+
+    public function removeDetail($index)
+    {
+        $detail = $this->details[$index];
+        
+        // Update totals
+        if ($detail['type'] === 'addition') {
+            $this->total_additions -= $detail['amount'];
+        } else {
+            $this->total_deductions -= $detail['amount'];
+        }
+        
+        unset($this->details[$index]);
+        $this->details = array_values($this->details);
+        
+        $this->calculateNetSalary();
+    }
+
+    protected function calculateNetSalary()
+    {
+        $this->net_salary = $this->basic_salary + $this->total_additions - $this->total_deductions;
+    }
+
     public function save()
     {
         $this->validate([
@@ -149,8 +219,19 @@ class EditPayroll extends Component
             'total_additions' => $this->total_additions,
             'net_salary' => $this->net_salary,
             'remarks' => $this->remarks,
-            'updated_by' => auth()->id(),
+            'updated_by' => Auth::id(),
         ]);
+
+        // Update payroll details
+        $this->payroll->details()->delete(); // Remove existing details
+        foreach ($this->details as $detail) {
+            $this->payroll->details()->create([
+                'type' => $detail['type'],
+                'description' => $detail['description'],
+                'amount' => $detail['amount'],
+                'remarks' => $detail['remarks']
+            ]);
+        }
 
         session()->flash('message', 'Payroll updated successfully.');
         return redirect()->route('payroll.show', $this->payroll);

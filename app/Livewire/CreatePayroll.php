@@ -25,10 +25,18 @@ class CreatePayroll extends Component
     public $total_additions = 0;
     public $net_salary = 0;
     public $remarks;
+    public $details = [];
+    public $newDetail = [
+        'type' => '',
+        'description' => '',
+        'amount' => 0,
+        'remarks' => ''
+    ];
 
     public function mount()
     {
         $this->payroll_month = now()->format('Y-m');
+        $this->details = [];
     }
 
     public function updatedEmployeeId()
@@ -101,6 +109,57 @@ class CreatePayroll extends Component
         $this->net_salary = $this->basic_salary - $this->total_deductions + $this->total_additions;
     }
 
+    public function addDetail()
+    {
+        $this->validate([
+            'newDetail.type' => 'required|in:addition,deduction',
+            'newDetail.description' => 'required|string|max:255',
+            'newDetail.amount' => 'required|numeric|min:0',
+            'newDetail.remarks' => 'nullable|string|max:255'
+        ]);
+
+        $this->details[] = $this->newDetail;
+        
+        // Update totals
+        if ($this->newDetail['type'] === 'addition') {
+            $this->total_additions += $this->newDetail['amount'];
+        } else {
+            $this->total_deductions += $this->newDetail['amount'];
+        }
+        
+        $this->calculateNetSalary();
+        
+        // Reset new detail
+        $this->newDetail = [
+            'type' => '',
+            'description' => '',
+            'amount' => 0,
+            'remarks' => ''
+        ];
+    }
+
+    public function removeDetail($index)
+    {
+        $detail = $this->details[$index];
+        
+        // Update totals
+        if ($detail['type'] === 'addition') {
+            $this->total_additions -= $detail['amount'];
+        } else {
+            $this->total_deductions -= $detail['amount'];
+        }
+        
+        unset($this->details[$index]);
+        $this->details = array_values($this->details);
+        
+        $this->calculateNetSalary();
+    }
+
+    protected function calculateNetSalary()
+    {
+        $this->net_salary = $this->basic_salary + $this->total_additions - $this->total_deductions;
+    }
+
     public function save()
     {
         $this->validate([
@@ -136,6 +195,11 @@ class CreatePayroll extends Component
             'remarks' => $this->remarks,
             'created_by' => auth()->id(),
         ]);
+
+        // Save payroll details
+        foreach ($this->details as $detail) {
+            $payroll->details()->create($detail);
+        }
 
         session()->flash('message', 'Payroll generated successfully.');
         return redirect()->route('payroll.show', $payroll);
